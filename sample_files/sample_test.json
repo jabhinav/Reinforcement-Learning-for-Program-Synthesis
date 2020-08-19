@@ -1,0 +1,27 @@
+{
+    "task": "State.000003.csv",
+    "input": [
+        "Aksel Hedegaard     1234 Pecan Avenue,Yangon,NY,(023) 966.2677,000.94.0933,03719",
+        "Yves Grethen  2345 Eighth Way ,Henderson,OK,(609) 880.5529,000.69.3866,38891",
+        "Jacqueline Martin     67 Ninth Boulevard,Guadalajara,OH,(319) 094.6012,000.08.3119,38891",
+        "Bola Atanda         2345 Sixth Street,Cologne,WV,(479) 143.0433,000.37.0076,41230",
+        "Amanda Haraldsen        34 First Way,Lansing,MS,(311) 343.5301,000.26.4391,41230",
+        "Marten Ruutli         7890 Eighth Route ,Fargo,OH,(956) 100.1022,000.08.9259,38891",
+        "Oriowo Owolabi  3456 Pecan Route,Basra,OR,(106) 620.5226,000.60.1806,38891",
+        "Bazarbay Abildauly    456 Fifth Route ,Dongguan,LA,(873) 884.2783,000.73.7962,38891",
+        "Mee.Yon Hah    4567 Second Highway ,Evansville,IA,(864) 453.3833,000.68.8231,17293",
+        "Zamira Yesimkyzy    45 Third Route,Brasilia,MI,(712) 012.9104,000.52.8290,41230"
+    ],
+    "output": [
+        "NY",
+        "OK",
+        "OH",
+        "WV",
+        "MS",
+        "OH",
+        "OR",
+        "LA",
+        "IA",
+        "MI"
+    ]
+}
