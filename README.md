@@ -1,8 +1,10 @@
-# Reinforcement-Learning-for-Program-Synthesis
+# Optimising Program Generalisability in Statistical Models with Reinforcement Learning
 
-Objective - Learn a transformation program from a small set of input-output examples. Following is the help-guide to use Reinforcement Learning framework in order to empower Deep Learning based statistical models for program generation.
+## Abstract
+Recent years have seen the development of statistical approaches employing sequence-to-sequence neural models for Programming-by-example (PbE) systems that capture user intent expressed through input-output examples adhering to pre-defined specifications. Although these approaches require less domain-specific knowledge and no hand-engineered rules, they are plagued with three main issues - (i) Program Aliasing - multiple semantically correct programs which are penalized during training against reference ground-truth programs (ii) Objective Mismatch - training the model performance is evaluated against the reference ground-truth program while during inference, the transformed output string is evaluated for correctness, and (iii) Exposure Bias - during training, the input to the decoder network is from ground-truth tokens while during the inference stage, it is from the learned model distribution. To address these issues, we propose to utilize policy gradients in a Reinforcement Learning (RL) framework, which is initialized through cross-entropy loss to ensure the model starts with meaningful policy instead of a random one. We discuss problem formulation the RL network architecture and show significant improvements on generalisability for both unseen function sequences and for unseen arguments in string manipulation tasks.
 
 ## Table of content
+Following is the help guide to use the Reinforcement Learning framework to improve Deep Learning based statistical models for program generation.
 
 - [Dataset](#dataset)
     - [Synthetic Dataset](#synthetic-dataset)
@@ -22,11 +24,11 @@ Stored at [SyntheticD]: It contains synthetically generated datasets to train Pb
 
 * `train_500k.json`: Contains 500k samples (program, input examples and corresponding outputs) for model training.
 * `val_50k.json`: Contains 50k samples for model evaluation.
-* `Val_50k_curate`: Contains splits of `val_50k.json` where we capture the overlap in transformation program seen by model during training:
+* `Val_50k_curate`: Contains splits of `val_50k.json` where we capture the overlap in the transformation program seen by the model during training:
   * `onlyFunctionNames`: Overlap/Partial/nonoverlap splits of `val_50k.json` where we match only the function names of the transformation programs with those from `train_500k.json`.
   * `nonModified`: Overlap/Partial/nonoverlap splits of `val_50k.json` where we match the function names and their arguments of the transformation programs with those from `train_500k.json`.
   * `Modified`: Ignore
-* `Test_Curated`: A subset of Val_50k_curated which contains three splits only where we want to evaluate the model based on following criterion: 
+* `Test_Curated`: A subset of Val_50k_curated which contains three splits only where we want to evaluate the model based on the following criterion: 
   * transformation programs seen by the model during training: `nonModified_overlap.json`
   * function sequence seen but arguments unseen: `onlyFunctionNames_overlap.json`
   * function sequences unseen: `onlyFunctionNames_nonOverlap.json`
@@ -35,28 +37,28 @@ Stored at [SyntheticD]: It contains synthetically generated datasets to train Pb
   
 Stored at [RealD]: The flash-fill dataset contains 335 real-life string manipulation tasks containing both logical and non-logical tasks. We shortlist 142 non-logical tasks and specify it in the file `no_logic_tasks.json`, which contains name and ID of each selected task. Additionally, we separately store 77 non-logical tasks which have at least 10 input-output example pairs in the file `no_logic_tasks_10_samples_each.json`. Here is the folder hierarchy and its interpretation: -
 
-* `FlashFill_orig_CSV`: Folder containing csv files for each flash-fill task, where each file has input-output examples pairs
-* `FlashFill_orig_JSON`: Folder containing json files in which every flash-fill task, its input samples and output samples are stored for ready-to-use.
-  * `flashFill_raw_no_empty_op.json`: Tasks do not contain input-output example pairs where output is an empty string.
-  * `flashFill_raw_with_empty_op.json`: Tasks contain input-output example pairs where expected output is and empty string.
-* `FlashFill_Curated_CSV`: Folder containing csv file for each flash-fill task specified in `no_logic_tasks.json`.
-* `FlashFill_Curated_JSON`: Folder containing json files in which only non-logical task, its input samples and output samples are stored for ready-to-use.
-  * `flashFill_raw_no_empty_op.json`: Contain non-logical tasks and each task is without input-output example pairs where output is an empty string. 
-  * `flashFill_10_samples_per_task.json`: Also contain non-logical tasks but each task now has fixed number of input-output example pairs. The task list is specified in `no_logic_tasks_10_samples_each.json`
+* `FlashFill_orig_CSV`: Folder containing CSV files for each flash-fill task, where each file has input-output example pairs
+* `FlashFill_orig_JSON`: Folder containing JSON files in which every flash-fill task, its input samples and output samples are stored for ready-to-use.
+  * `flashFill_raw_no_empty_op.json`: Tasks do not contain input-output example pairs where the output is an empty string.
+  * `flashFill_raw_with_empty_op.json`: Tasks contain input-output example pairs where the expected output is an empty string.
+* `FlashFill_Curated_CSV`: Folder containing CSV file for each flash-fill task specified in `no_logic_tasks.json`.
+* `FlashFill_Curated_JSON`: Folder containing JSON files in which only non-logical tasks, input samples and output samples are stored for ready-to-use.
+  * `flashFill_raw_no_empty_op.json`: Contains non-logical tasks, and each task is without input-output example pairs where the output is an empty string. 
+  * `flashFill_10_samples_per_task.json`: Also contains non-logical tasks, but each task now has a fixed number of input-output example pairs. The task list is specified in `no_logic_tasks_10_samples_each.json`
 
 ## Model Training
 
-Here we provide instructions to train the model using both XE Loss and RE Loss.
+Here, we provide instructions to train the model using both XE Loss and RE Loss.
 
 <details><summary><b>Cross Entropy Loss (XE)</b></summary>
   
-1. Install the dependecies.
+1. Install the dependencies.
 
     ```sh
     $ pip install -r requirements.txt
     ```
     
-2. Download the training, validation dataset from [here](Will add) into the `/data` folder and indicate their relative path in the config file (See [Config](#config)).
+2. Download the training-validation dataset from [here](Will add) into the `/data` folder and indicate their relative path in the config file (See [Config](#config)).
 
  ```json
    {
@@ -97,13 +99,13 @@ And now here’s how you train the model using AllenNLP ():
 ```sh
  $ allennlp train root_dir/neural_architecture.jsonnet -s root_dir/checkpoint --include-package root_dir/model
 ```
-**Instructions**: There should be no pre-existing `checkpoint` folder directory present at `root_dir/checkpoint`. In case you want to resume model training from previously saved checkpoint in your serialisation directory, use `-r` flag in the command.
+**Instructions**: There should be no pre-existing `checkpoint` folder directory present at `root_dir/checkpoint`. In case you want to resume model training from the previously saved checkpoint in your serialisation directory, use `-r` flag in the command.
 
-**Tips**: RL-based training is memory consuming, since it stores `batch_size*nb_rollouts*max_decoding_steps` number of gradients before back-propagation. Decreasing the `nb_rollouts` too much is not recommended because higher value (64-100) is required for stable RL training. Also, `max_decoding_steps` should roughly match the avg. program length (i.e. num of functions + their arguments) we allow the model to decode. Thus, only parameter we can play with is `batch_size`. 
+**Tips**: RL-based training is memory consuming, since it stores `batch_size*nb_rollouts*max_decoding_steps` number of gradients before back-propagation. Decreasing the `nb_rollouts` too much is not recommended because a higher value (64-100) is required for stable RL training. Also, `max_decoding_steps` should roughly match the avg. program length (i.e. num of functions + their arguments) we allow the model to decode. Thus, only parameter we can play with is `batch_size`. 
 
-Therefore, by default we perform gradient accumulation for `rl` and `beam-rl` training (`accumulate_gradients` in `custom_trainer.py` is set to `True`). The idea is, instead of doing the forward pass for complete batch at once, you do it in steps, accumulate the gradients for each step and then back-propagate. The parameter that we can play with is `rl_inner_batch` which indicates inner batch size and it should perfectly divide batch_size. Note that `rl_inner_batch` balances the trade-off between time-consumed and memory-consumed. If it is high, time-consumed for training will decrease but memory consumption will increase and vice-versa when it is too low.
+Therefore, by default, we perform gradient accumulation for `rl` and `beam-rl` training (`accumulate_gradients` in `custom_trainer.py` is set to `True`). The idea is, instead of doing the forward pass for complete batch at once, you do it in steps, accumulate the gradients for each step and then back-propagate. The parameter that we can play with is `rl_inner_batch` which indicates inner batch size and it should perfectly divide batch_size. Note that `rl_inner_batch` balances the trade-off between time-consumed and memory-consumed. If it is high, time-consumed for training will decrease, but memory consumption will increase and vice-versa when it is too low.
 
-During testing, this is not the case. We use Beam-search to decode top-k programs, where k is set to 100 (See parameter `val_beam_size` in `program_decoder_rl.py`)  and we allow for maximum of 50 decoding steps (See parameter val_max_steps in `program_decoder_rl.py`). Max_decoding_steps during train and test time need not be same. For later, I have manually set it to aforementioned values in program_decoder_rl.py.
+During testing, this is not the case. We use Beam-search to decode top-k programs, where k is set to 100 (See parameter `val_beam_size` in `program_decoder_rl.py`)  and we allow for maximum of 50 decoding steps (See parameter val_max_steps in `program_decoder_rl.py`). Max_decoding_steps during train and test time need not be the same. For later, I have manually set it to the aforementioned values in program_decoder_rl.py.
 
 ## Config
 
@@ -117,7 +119,7 @@ In the config file, you can tune the following parameters:
 * **max_decoding_steps**: Indicates for how many maximum number of time-steps, we are allowing decoding of program.
 * **cuda_device**: To choose between CPU/GPU. For CPU, use -1 and for GPU, use 0. Mulit-GPU training currently not supported.
 
-* Optimisation based parameters (Do not set shuffle to `true`. Model is sensitive to order of training samples, they appear in):
+* Optimisation-based parameters (Do not set shuffle to `true`. Model is sensitive to order of training samples, they appear in):
 
    ```json
       "trainer": {
